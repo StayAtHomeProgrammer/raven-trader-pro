@@ -1,7 +1,7 @@
 TESTNET = True
 
-RPC_USERNAME = ""
-RPC_PASSWORD = ""
+RPC_USERNAME = "StayAtHomeProgrammer"
+RPC_PASSWORD = "justapoormf"
 RPC_HOST = "localhost"
 RPC_POST = 18766 if TESTNET else 8766
 SWAP_STORAGE_PATH = "orders.json"

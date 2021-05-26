@@ -23,8 +23,18 @@ from config import *
 
 ## Main app entry point
 if __name__ == "__main__":
-  chain_info = do_rpc("getblockchaininfo")
   app = QApplication(sys.argv)
+  try:
+    chain_info = do_rpc("getblockchaininfo")
+  except RPCError as error:
+    print("RPC Error: ", error.reason)
+    show_error("Error connecting",
+               "Error connecting to RPC server.\r\n{}".format(RPC_URL),
+               "Make sure you have the TESTNET variable in raven.py set correctly"
+               " and \nthe following configuration "
+               "variables are in your raven.conf file" +
+               "\r\n\r\nserver=1\r\nrpcuser={}\r\nrpcpassword={}".format(RPC_USERNAME, RPC_PASSWORD))
+    # exit(1) Comment out for debugging
 
   #If the headers and blocks are not within 5 of each other,
   #then the chain is likely still syncing
@@ -50,6 +60,5 @@ if __name__ == "__main__":
     "Network: {}\r\nCurrent Headers: {}\r\nCurrent Blocks: {}".format(chain_info["chain"], chain_info["headers"], chain_info["blocks"]))
   else:
     show_error("Error connecting", 
-    "Error connecting to RPC server.\r\n{}".format(RPC_URL), 
-    "Make sure the following configuration variables are in your raven.conf file"+
-    "\r\n\r\nserver=1\r\nrpcuser={}\r\nrpcpassword={}".format(RPC_USERNAME, RPC_PASSWORD))
+    "We dont know what went wrong",
+    "sorry")

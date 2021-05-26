@@ -10,20 +10,20 @@ from PyQt5 import uic
 import sys, getopt, argparse, json, time, getpass, os.path
 from util import *
 from config import *
+import urllib3
 
 def do_rpc(method, log_error=True, **kwargs):
   req = Request(method, **kwargs)
   try:
     resp = post(RPC_URL, json=req)
-    if resp.status_code != 200:
-      print("==>", end="")
-      print(req)
-      print("<== ERR:", end="")
-      print(resp.text)
-    return json.loads(resp.text)["result"]
-  except:
-    print("RPC Error")
-    return None
+  except Exception as error:
+    raise RPCError("Could not connect to wallet RPC", error)
+  if resp.status_code != 200:
+    print("==>", end="")
+    print(req)
+    print("<== ERR:", end="")
+    print(resp.text)
+  return json.loads(resp.text)["result"]
 
 def decode_full(txid):
   resp = get(TX_QRY.format(txid))
@@ -44,7 +44,7 @@ def dup_transaction(tx):
   new_vout = {}
   for old_vin in tx["vin"]:
     new_vin.append({"txid": old_vin["txid"], "vout": old_vin["vout"], "sequence": old_vin["sequence"]})
-  for old_vout in sorted(tx["vout"], key=lambda vo: vo["n"]):
+  for old_vout in sorted(tx["vout"], key=lambda vo: vo["n"]): # What??
     vout_script = old_vout["scriptPubKey"]
     vout_addr = vout_script["addresses"][0]
     if(vout_script["type"] == "transfer_asset"):
@@ -67,3 +67,9 @@ def search_swap_tx(utxo):
     check_height -= 1
   print("Unable to find transaction for completed swap")
   return None #If we don't find it 10 blocks back, who KNOWS what happened to it
+
+class RPCError(Exception):
+  def __init__(self, reason, baseException = None):
+    self.reason = reason
+    self.baseException = baseException # The exception the caused us to raise the exception
+                                       # Ex. urllib3.exceptions.HttpError --> RPCError
