@@ -98,6 +98,7 @@ class NewOrderDialog(QDialog):
         if self.receivingAssetExists:
             self.spinUnitPrice.setEnabled(True)
             self.btnCheckAvailableReceiving.setText("Yes! - you have {} total".format(balance))
+            self.btnCheckAvailableReceiving.setEnabled(False)
             self.spinUnitPrice.setMaximum(float(balance))
         else:
             if self.ReceivingAsset.text().islower():
@@ -120,8 +121,8 @@ class NewOrderDialog(QDialog):
         summary = "Send yourself {} to costruct a {} order?"
 
         if self.mode == "buy":
-            summary = summary.format("{:.8g} {}}".format(self.total_price, "RVN" if not self.assetForAsset
-                                                         else self.ReceivingAsset.text()), self.mode)
+            summary = summary.format("{:.8g} {}".format(self.total_price, "RVN" if not self.assetForAsset
+                                                        else self.ReceivingAsset.text()), self.mode)
         elif self.mode == "sell":
             summary = summary.format("{:.8g}x [{}]".format(self.quantity, self.asset_name), self.mode)
 
