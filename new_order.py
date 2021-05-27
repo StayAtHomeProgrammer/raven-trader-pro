@@ -62,6 +62,7 @@ class NewOrderDialog(QDialog):
         self.update()
 
         if self.AssetTrade.isChecked():
+            print("clicked")
             self.label_3.setText("Amount")
             self.spinUnitPrice.setSuffix(self.cmbAssets.currentText())
 
