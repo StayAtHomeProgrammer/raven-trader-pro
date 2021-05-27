@@ -221,7 +221,7 @@ class NewOrderDialog(QDialog):
         else:
             self.assetForAsset = False
             self.ReciveingAsset.setEnabled(False)
-            self.btnCheckReciveingAsset.setEnabled(False)
+            self.btnCheckAvailableReciveing.setEnabled(False)
             self.label_3.setText("Price")
             self.spinUnitPrice.setSuffix(" RVN")
 
