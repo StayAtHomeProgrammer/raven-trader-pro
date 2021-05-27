@@ -27,6 +27,7 @@ class NewOrderDialog(QDialog):
         self.swap_storage.load_utxos()
         self.waiting_txid = None
         self.asset_exists = True
+        self.receivingAssetExists = False
         self.all_utxo = False  # allow perfectly rounded UTXO's only when waiting from the start
 
         if self.mode == "buy":
@@ -38,7 +39,9 @@ class NewOrderDialog(QDialog):
             self.cmbAssets.currentTextChanged.connect(self.asset_changed)
             self.cmbAssets.addItems(self.swap_storage.my_asset_names)
             self.cmbAssets.setCurrentText("")
-            self.ReceivingAsset.textChanged.connect(self.update)
+            self.ReceivingAsset.textChanged.connect(self.receiving_asset_changed)
+            self.receivingAssetName = self.ReceivingAsset.text()
+            self.btnCheckAvailableReceiving.clicked.connect(self.check_available_receiving)
 
         elif self.mode == "sell":
             self.setWindowTitle("New Sell Order")
@@ -89,17 +92,17 @@ class NewOrderDialog(QDialog):
         self.update()
 
     def check_available_receiving(self):
-        details = do_rpc("getassetdata", asset_name=self.receivingAsset.text())
-        self.asset_exists = True if details else False
-        self.btnCheckAvailable.setEnabled(False)
-        if self.asset_exists:
-            self.spinQuantity.setEnabled(True)
-            self.btnCheckAvailable.setText("Yes! - {} total".format(details["amount"]))
-            self.spinQuantity.setMaximum(float(details["amount"]))
+        balance = self.swap_storage.assets[self.receivingAssetName]["balance"]
+        self.receivingAssetExists = bool(int(balance))
+        self.btnCheckAvailableReceiving.setEnabled(False)
+        if self.receivingAssetExists:
+            self.spinUnitPrice.setEnabled(True)
+            self.btnCheckAvailableReceiving.setText("Yes! - you have {} total".format(balance))
+            self.spinUnitPrice.setMaximum(float(balance))
         else:
             if self.ReceivingAsset.text().islower():
-                show_error("Error", "Asset does not exist! Assets are case-sensitive.")
-            self.spinQuantity.setEnabled(False)
+                show_error("Error", "You do not have this asset! Assets are case-sensitive.")
+            self.spinUnitPrice.setEnabled(False)
             self.btnCheckAvailable.setText("Asset does not exist!")
         self.update()
 
@@ -107,6 +110,10 @@ class NewOrderDialog(QDialog):
         self.asset_exists = False
         self.btnCheckAvailable.setText("Check Available")
         self.btnCheckAvailable.setEnabled(True)
+
+    def receiving_asset_changed(self):
+        self.receivingAssetExists = False
+        self.btnCheckReceivingAsset.setText("Check Balance")
 
     def create_utxo(self):
         summary = "Send yourself {} to costruct a {} order?"
@@ -186,6 +193,7 @@ class NewOrderDialog(QDialog):
 
     def update(self):
         # Read GUI
+        self.receivingAssetName = self.ReceivingAsset.text()
         self.quantity = self.spinQuantity.value()
         self.price = self.spinUnitPrice.value()
         self.destination = self.txtDestination.text()
@@ -195,9 +203,13 @@ class NewOrderDialog(QDialog):
             self.asset_name = self.cmbAssets.currentText()
             self.order_utxo = self.swap_storage.find_utxo("rvn", self.total_price, skip_locks=True, skip_rounded=False)
             self.chkUTXOReady.setText("UTXO Ready ({:.8g} RVN)".format(self.total_price))
-            # don't have enough rvn for the order
-            if self.total_price > self.swap_storage.balance:
-                self.valid_order = False
+            if not self.assetForAsset:
+                # don't have enough rvn for the order
+                if self.total_price > self.swap_storage.balance:
+                    self.valid_order = False
+            else:
+                if self.total_price > self.swap_storage.assets[self.receivingAssetName]["balance"]:
+                    self.valid_order = False
         else:
             self.asset_name = self.swap_storage.my_asset_names[self.cmbAssets.currentIndex()]
             self.order_utxo = self.swap_storage.find_utxo("asset", self.quantity, name=self.asset_name, skip_locks=True,
