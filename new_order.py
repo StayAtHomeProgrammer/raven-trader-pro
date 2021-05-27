@@ -39,7 +39,6 @@ class NewOrderDialog(QDialog):
             self.cmbAssets.addItems(self.swap_storage.my_asset_names)
             self.cmbAssets.setCurrentText("")
             self.ReceivingAsset.textChanged.connect(self.update)
-            # self.btnCheckreceivingAsset.clicked.connect(self.check_available_receiving)
 
         elif self.mode == "sell":
             self.setWindowTitle("New Sell Order")
@@ -231,7 +230,7 @@ class NewOrderDialog(QDialog):
         if self.AssetTrade.isChecked():
             self.assetForAsset = True
             self.ReceivingAsset.setEnabled(True)
-            self.btnCheckReceivingAsset.setEnabled(True)
+            self.btnCheckAvailableReceiving.setEnabled(True)
             self.label_3.setText("Amount")
             self.spinUnitPrice.setSuffix(" " + self.ReceivingAsset.text())
         else:
