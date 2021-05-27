@@ -140,7 +140,11 @@ class NewOrderDialog(QDialog):
                     check_unlock()
 
                     new_change_addr = do_rpc("getnewaddress")
-                    self.waiting_txid = do_rpc("sendtoaddress", address=new_change_addr, amount=self.total_price)
+                    if not self.assetForAsset:
+                        self.waiting_txid = do_rpc("sendtoaddress", address=new_change_addr, amount=self.total_price)
+                    else:
+                        self.waiting_txid = do_rpc("transfer", asset=self.receivingAssetName, qty=self.price,
+                                                   to_address=new_change_addr)
                 elif self.mode == "sell":
                     print("Creating self asset transaction")
                     check_unlock()
@@ -217,7 +221,11 @@ class NewOrderDialog(QDialog):
 
         if self.mode == "buy":
             self.asset_name = self.cmbAssets.currentText()
-            self.order_utxo = self.swap_storage.find_utxo("rvn", self.total_price, skip_locks=True, skip_rounded=False)
+            if not self.assetForAsset:
+                self.order_utxo = self.swap_storage.find_utxo("rvn", self.total_price, skip_locks=True, skip_rounded=False)
+            else:
+                self.order_utxo = self.swap_storage.find_utxo("asset", self.total_price, name=self.receivingAssetName,
+                                                              skip_locks=True, skip_rounded=False)
             self.chkUTXOReady.setText("UTXO Ready ({:.8g} RVN)".format(self.total_price))
             if not self.assetForAsset:
                 # don't have enough rvn for the order

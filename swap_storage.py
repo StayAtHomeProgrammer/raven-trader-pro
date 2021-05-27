@@ -117,6 +117,7 @@ class SwapStorage:
 
     def find_utxo(self, type, quantity, name=None, exact=True, skip_locks=False, skip_rounded=True, sort_utxo=False):
         # print("Find UTXO: {} Exact: {} Skip Locks: {}".format(quantity, exact, skip_locks))
+        # TODO: Probably need to make changes for asset to asset
         if type == "rvn":
             utxo_src = sorted([utxo for utxo in self.utxos],
                               key=lambda utxo: utxo["amount"]) if sort_utxo else self.utxos
