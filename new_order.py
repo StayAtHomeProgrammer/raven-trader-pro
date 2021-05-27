@@ -166,6 +166,7 @@ class NewOrderDialog(QDialog):
 
     def update(self):
         # Read GUI
+        print("test")
         self.quantity = self.spinQuantity.value()
         self.price = self.spinUnitPrice.value()
         self.destination = self.txtDestination.text()
@@ -205,6 +206,7 @@ class NewOrderDialog(QDialog):
             self.btnDialogButtons.setStandardButtons(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
         else:
             self.btnDialogButtons.setStandardButtons(QDialogButtonBox.Cancel)
+
         if self.AssetTrade.isChecked():
             print("clicked")
             self.label_3.setText("Amount")
