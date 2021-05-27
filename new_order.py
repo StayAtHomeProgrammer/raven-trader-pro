@@ -186,7 +186,6 @@ class NewOrderDialog(QDialog):
 
     def update(self):
         # Read GUI
-        print("test")
         self.quantity = self.spinQuantity.value()
         self.price = self.spinUnitPrice.value()
         self.destination = self.txtDestination.text()
@@ -213,20 +212,6 @@ class NewOrderDialog(QDialog):
         if self.waiting_txid or not self.asset_exists:
             self.valid_order = False
 
-        # valid_order check doesn't cover UTXO existing b/c valid_order determins if we enable the UTXO button or not
-        # Update GUI
-        self.lblTotalDisplay.setText("{:.8g} RVN".format(self.total_price))
-        self.chkUTXOReady.setChecked(self.order_utxo is not None)
-        if self.waiting_txid:
-            self.btnCreateUTXO.setEnabled(False)
-        else:
-            self.btnCreateUTXO.setEnabled(self.order_utxo is None)
-        # Hide the button if we don't have a valid order
-        if self.order_utxo and self.valid_order:
-            self.btnDialogButtons.setStandardButtons(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
-        else:
-            self.btnDialogButtons.setStandardButtons(QDialogButtonBox.Cancel)
-
         if self.AssetTrade.isChecked():
             self.assetForAsset = True
             self.ReceivingAsset.setEnabled(True)
@@ -239,6 +224,21 @@ class NewOrderDialog(QDialog):
             self.btnCheckAvailableReceiving.setEnabled(False)
             self.label_3.setText("Price")
             self.spinUnitPrice.setSuffix(" RVN")
+
+        # valid_order check doesn't cover UTXO existing b/c valid_order determins if we enable the UTXO button or not
+        # Update GUI
+        self.lblTotalDisplay.setText("{:.8g} {}".format(self.total_price, "RVN" if not self.assetForAsset
+                                                        else self.ReceivingAsset.text()))
+        self.chkUTXOReady.setChecked(self.order_utxo is not None)
+        if self.waiting_txid:
+            self.btnCreateUTXO.setEnabled(False)
+        else:
+            self.btnCreateUTXO.setEnabled(self.order_utxo is None)
+        # Hide the button if we don't have a valid order
+        if self.order_utxo and self.valid_order:
+            self.btnDialogButtons.setStandardButtons(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
+        else:
+            self.btnDialogButtons.setStandardButtons(QDialogButtonBox.Cancel)
 
     def build_order(self):
         return SwapTransaction({
