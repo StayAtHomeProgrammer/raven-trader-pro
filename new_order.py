@@ -23,6 +23,7 @@ class NewOrderDialog(QDialog):
         if (self.mode != "buy" and self.mode != "sell"):
             raise OrderException("Invalid Order Mode")
 
+        self.assetForAsset = self.AssetTrade.isChecked()
         self.swap_storage.load_utxos()
         self.waiting_txid = None
         self.asset_exists = True
@@ -32,18 +33,19 @@ class NewOrderDialog(QDialog):
             self.setWindowTitle("New Buy Order")
             self.cmbAssets.setEditable(True)
             self.spinQuantity.setEnabled(False)
-            self.btnCheckAvailable.clicked.connect(self.check_available)
+            self.btnCheckAvailable.clicked.connect(self.check_available(self.cmbAssets.currentText()))
             self.AssetTrade.clicked.connect(self.update)
-            self.cmbAssets.currentTextChanged.connect(self.asset_changed)
+            self.cmbAssets.currentTextChanged.connect(self.asset_changed())
             self.cmbAssets.addItems(self.swap_storage.my_asset_names)
             self.cmbAssets.setCurrentText("")
+            self.btnCheckReciveingAsset.clicked.connect(self.check_available(self.ReciveingAsset.text()))
+
         elif self.mode == "sell":
             self.setWindowTitle("New Sell Order")
             self.cmbAssets.setEditable(False)
             self.cmbAssets.addItems(
                 ["{} [{}]".format(v, self.swap_storage.assets[v]["balance"]) for v in self.swap_storage.my_asset_names])
             self.btnCheckAvailable.setVisible(False)
-
         if prefill:
             self.cmbAssets.setCurrentText(prefill["asset"])
             self.spinQuantity.setValue(prefill["quantity"])
@@ -70,9 +72,9 @@ class NewOrderDialog(QDialog):
                     "To construct a one-sided market order, you must have a single UTXO of the exact amount you would like to advertise.",
                     parent=self)
 
-    def check_available(self):
+    def check_available(self, asset: str):
         # TODO: Save this asset data for later
-        details = do_rpc("getassetdata", asset_name=self.cmbAssets.currentText())
+        details = do_rpc("getassetdata", asset_name=asset)
         self.asset_exists = True if details else False
         self.btnCheckAvailable.setEnabled(False)
         if self.asset_exists:
@@ -80,7 +82,7 @@ class NewOrderDialog(QDialog):
             self.btnCheckAvailable.setText("Yes! - {} total".format(details["amount"]))
             self.spinQuantity.setMaximum(float(details["amount"]))
         else:
-            if self.cmbAssets.currentText().islower():
+            if asset.islower():
                 show_error("Error", "Asset does not exist! Assets are case-sensitive.")
             self.spinQuantity.setEnabled(False)
             self.btnCheckAvailable.setText("Asset does not exist!")
@@ -95,12 +97,14 @@ class NewOrderDialog(QDialog):
         summary = "Send yourself {} to costruct a {} order?"
 
         if self.mode == "buy":
-            summary = summary.format("{:.8g} RVN".format(self.total_price), self.mode)
+            summary = summary.format("{:.8g} {}}".format(self.total_price, "RVN" if not self.assetForAsset
+                                                         else self.ReciveingAsset.text()), self.mode)
         elif self.mode == "sell":
             summary = summary.format("{:.8g}x [{}]".format(self.quantity, self.asset_name), self.mode)
 
         if (show_dialog("Are you sure?",
-                        "This involves sending yourself an exact amount of RVN/Assets to produce the order. This wil encur a smal transaction fee",
+                        "This involves sending yourself an exact amount of RVN/Assets to produce the order."
+                        " This wil Incur a small transaction fee",
                         summary, self)):
             # This makes sure all known swaps UTXO's are locked and won't be used when a transfer is requested
             # Could also smart-lock even-valued UTXO's but that's a whole thing...
@@ -209,9 +213,15 @@ class NewOrderDialog(QDialog):
             self.btnDialogButtons.setStandardButtons(QDialogButtonBox.Cancel)
 
         if self.AssetTrade.isChecked():
+            self.assetForAsset = True
+            self.ReciveingAsset.setEnabled(True)
+            self.btnCheckReciveingAsset.setEnabled(True)
             self.label_3.setText("Amount")
             self.spinUnitPrice.setSuffix(" " + self.cmbAssets.currentText())
         else:
+            self.assetForAsset = False
+            self.ReciveingAsset.setEnabled(False)
+            self.btnCheckReciveingAsset.setEnabled(False)
             self.label_3.setText("Price")
             self.spinUnitPrice.setSuffix(" RVN")
 
@@ -220,7 +230,7 @@ class NewOrderDialog(QDialog):
             "asset": self.asset_name,
             "own": True,
             "quantity": self.quantity,
-            "unit_price": self.price,
+            "unit_price": self.price, # For asset for asset swaps "price" will be the amount of asset being asked for
             "utxo": self.order_utxo["txid"] + "|" + str(self.order_utxo["vout"]),
             "destination": self.destination,
             "state": "new",
