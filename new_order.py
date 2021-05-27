@@ -35,7 +35,7 @@ class NewOrderDialog(QDialog):
             self.spinQuantity.setEnabled(False)
             self.btnCheckAvailable.clicked.connect(self.check_available)
             self.AssetTrade.clicked.connect(self.update)
-            self.cmbAssets.currentTextChanged.connect(self.asset_changed())
+            self.cmbAssets.currentTextChanged.connect(self.asset_changed)
             self.cmbAssets.addItems(self.swap_storage.my_asset_names)
             self.cmbAssets.setCurrentText("")
             self.ReceivingAsset.textChanged.connect(self.update())
