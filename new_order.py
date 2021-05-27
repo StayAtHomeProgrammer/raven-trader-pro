@@ -122,13 +122,13 @@ class NewOrderDialog(QDialog):
 
         if self.mode == "buy":
             summary = summary.format("{:.8g} {}".format(self.total_price, "RVN" if not self.assetForAsset
-                                                        else self.ReceivingAsset.text()), self.mode)
+                                                        else self.receivingAssetName), self.mode)
         elif self.mode == "sell":
             summary = summary.format("{:.8g}x [{}]".format(self.quantity, self.asset_name), self.mode)
 
         if (show_dialog("Are you sure?",
                         "This involves sending yourself an exact amount of RVN/Assets to produce the order."
-                        " This wil Incur a small transaction fee",
+                        " This will Incur a small transaction fee",
                         summary, self)):
             # This makes sure all known swaps UTXO's are locked and won't be used when a transfer is requested
             # Could also smart-lock even-valued UTXO's but that's a whole thing...
