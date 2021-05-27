@@ -33,12 +33,13 @@ class NewOrderDialog(QDialog):
             self.setWindowTitle("New Buy Order")
             self.cmbAssets.setEditable(True)
             self.spinQuantity.setEnabled(False)
-            self.btnCheckAvailable.clicked.connect(self.check_available(self.cmbAssets.currentText()))
+            self.btnCheckAvailable.clicked.connect(self.check_available)
             self.AssetTrade.clicked.connect(self.update)
             self.cmbAssets.currentTextChanged.connect(self.asset_changed())
             self.cmbAssets.addItems(self.swap_storage.my_asset_names)
             self.cmbAssets.setCurrentText("")
-            self.btnCheckReciveingAsset.clicked.connect(self.check_available(self.ReciveingAsset.text()))
+            self.ReceivingAsset.textChanged.connect(self.update())
+            # self.btnCheckreceivingAsset.clicked.connect(self.check_available_receiving)
 
         elif self.mode == "sell":
             self.setWindowTitle("New Sell Order")
@@ -72,9 +73,9 @@ class NewOrderDialog(QDialog):
                     "To construct a one-sided market order, you must have a single UTXO of the exact amount you would like to advertise.",
                     parent=self)
 
-    def check_available(self, asset: str):
+    def check_available(self):
         # TODO: Save this asset data for later
-        details = do_rpc("getassetdata", asset_name=asset)
+        details = do_rpc("getassetdata", asset_name=self.cmbAssets.currentText())
         self.asset_exists = True if details else False
         self.btnCheckAvailable.setEnabled(False)
         if self.asset_exists:
@@ -82,7 +83,22 @@ class NewOrderDialog(QDialog):
             self.btnCheckAvailable.setText("Yes! - {} total".format(details["amount"]))
             self.spinQuantity.setMaximum(float(details["amount"]))
         else:
-            if asset.islower():
+            if self.cmbAssets.currentText().islower():
+                show_error("Error", "Asset does not exist! Assets are case-sensitive.")
+            self.spinQuantity.setEnabled(False)
+            self.btnCheckAvailable.setText("Asset does not exist!")
+        self.update()
+
+    def check_available_receiving(self):
+        details = do_rpc("getassetdata", asset_name=self.receivingAsset.text())
+        self.asset_exists = True if details else False
+        self.btnCheckAvailable.setEnabled(False)
+        if self.asset_exists:
+            self.spinQuantity.setEnabled(True)
+            self.btnCheckAvailable.setText("Yes! - {} total".format(details["amount"]))
+            self.spinQuantity.setMaximum(float(details["amount"]))
+        else:
+            if self.receivingAsset.text().islower():
                 show_error("Error", "Asset does not exist! Assets are case-sensitive.")
             self.spinQuantity.setEnabled(False)
             self.btnCheckAvailable.setText("Asset does not exist!")
@@ -98,7 +114,7 @@ class NewOrderDialog(QDialog):
 
         if self.mode == "buy":
             summary = summary.format("{:.8g} {}}".format(self.total_price, "RVN" if not self.assetForAsset
-                                                         else self.ReciveingAsset.text()), self.mode)
+                                                         else self.receivingAsset.text()), self.mode)
         elif self.mode == "sell":
             summary = summary.format("{:.8g}x [{}]".format(self.quantity, self.asset_name), self.mode)
 
@@ -214,14 +230,14 @@ class NewOrderDialog(QDialog):
 
         if self.AssetTrade.isChecked():
             self.assetForAsset = True
-            self.ReciveingAsset.setEnabled(True)
-            self.btnCheckReciveingAsset.setEnabled(True)
+            self.receivingAsset.setEnabled(True)
+            self.btnCheckreceivingAsset.setEnabled(True)
             self.label_3.setText("Amount")
-            self.spinUnitPrice.setSuffix(" " + self.cmbAssets.currentText())
+            self.spinUnitPrice.setSuffix(" " + self.ReceivingAsset.text())
         else:
             self.assetForAsset = False
-            self.ReciveingAsset.setEnabled(False)
-            self.btnCheckAvailableReciveing.setEnabled(False)
+            self.receivingAsset.setEnabled(False)
+            self.btnCheckAvailablereceiving.setEnabled(False)
             self.label_3.setText("Price")
             self.spinUnitPrice.setSuffix(" RVN")
 
@@ -238,6 +254,8 @@ class NewOrderDialog(QDialog):
             "raw": "--",
             "txid": ""
         })
+
+
 
 
 class OrderException(Exception):
