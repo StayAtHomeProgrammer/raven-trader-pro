@@ -210,10 +210,10 @@ class NewOrderDialog(QDialog):
 
         if self.AssetTrade.isChecked():
             self.label_3.setText("Amount")
-            self.spinUnitPrice.setSuffix(self.cmbAssets.currentText())
+            self.spinUnitPrice.setSuffix(" ", self.cmbAssets.currentText())
         else:
             self.label_3.setText("Price")
-            self.spinUnitPrice.setSuffix(self.cmbAssets.currentText())
+            self.spinUnitPrice.setSuffix(" RVN")
 
     def build_order(self):
         return SwapTransaction({
