@@ -98,7 +98,7 @@ class NewOrderDialog(QDialog):
             self.btnCheckAvailable.setText("Yes! - {} total".format(details["amount"]))
             self.spinQuantity.setMaximum(float(details["amount"]))
         else:
-            if self.receivingAsset.text().islower():
+            if self.ReceivingAsset.text().islower():
                 show_error("Error", "Asset does not exist! Assets are case-sensitive.")
             self.spinQuantity.setEnabled(False)
             self.btnCheckAvailable.setText("Asset does not exist!")
@@ -114,7 +114,7 @@ class NewOrderDialog(QDialog):
 
         if self.mode == "buy":
             summary = summary.format("{:.8g} {}}".format(self.total_price, "RVN" if not self.assetForAsset
-                                                         else self.receivingAsset.text()), self.mode)
+                                                         else self.ReceivingAsset.text()), self.mode)
         elif self.mode == "sell":
             summary = summary.format("{:.8g}x [{}]".format(self.quantity, self.asset_name), self.mode)
 
@@ -230,7 +230,7 @@ class NewOrderDialog(QDialog):
 
         if self.AssetTrade.isChecked():
             self.assetForAsset = True
-            self.receivingAsset.setEnabled(True)
+            self.ReceivingAsset.setEnabled(True)
             self.btnCheckreceivingAsset.setEnabled(True)
             self.label_3.setText("Amount")
             self.spinUnitPrice.setSuffix(" " + self.ReceivingAsset.text())
