@@ -194,7 +194,7 @@
     </widget>
    </item>
    <item row="8" column="1">
-    <widget class="QLineEdit" name="ReciveingAsset">
+    <widget class="QLineEdit" name="ReceivingAsset">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -207,7 +207,7 @@
     </widget>
    </item>
    <item row="9" column="1">
-    <widget class="QPushButton" name="btnCheckAvailableReciveing">
+    <widget class="QPushButton" name="btnCheckAvailableReceiving">
      <property name="enabled">
       <bool>false</bool>
      </property>
