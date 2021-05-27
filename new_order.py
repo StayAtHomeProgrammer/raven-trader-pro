@@ -159,7 +159,7 @@ class NewOrderDialog(QDialog):
             self.update()
 
     def start_waiting(self):
-        if hasattr(self, "udpateTimer") and self.updateTimer:
+        if hasattr(self, "updateTimer") and self.updateTimer:
             self.updateTimer.stop()
 
         self.wait_count = 0
