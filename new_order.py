@@ -113,7 +113,7 @@ class NewOrderDialog(QDialog):
 
     def receiving_asset_changed(self):
         self.receivingAssetExists = False
-        self.btnCheckReceivingAsset.setText("Check Balance")
+        self.btnCheckAvailableReceiving.setText("Check Balance")
 
     def create_utxo(self):
         summary = "Send yourself {} to costruct a {} order?"
