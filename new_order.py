@@ -199,6 +199,20 @@ class NewOrderDialog(QDialog):
         self.destination = self.txtDestination.text()
         self.total_price = self.quantity * self.price
         self.valid_order = True
+
+        if self.AssetTrade.isChecked():
+            self.assetForAsset = True
+            self.ReceivingAsset.setEnabled(True)
+            self.btnCheckAvailableReceiving.setEnabled(True)
+            self.label_3.setText("Amount")
+            self.spinUnitPrice.setSuffix(" " + self.ReceivingAsset.text())
+        else:
+            self.assetForAsset = False
+            self.ReceivingAsset.setEnabled(False)
+            self.btnCheckAvailableReceiving.setEnabled(False)
+            self.label_3.setText("Price")
+            self.spinUnitPrice.setSuffix(" RVN")
+
         if self.mode == "buy":
             self.asset_name = self.cmbAssets.currentText()
             self.order_utxo = self.swap_storage.find_utxo("rvn", self.total_price, skip_locks=True, skip_rounded=False)
@@ -206,9 +220,6 @@ class NewOrderDialog(QDialog):
             if not self.assetForAsset:
                 # don't have enough rvn for the order
                 if self.total_price > self.swap_storage.balance:
-                    self.valid_order = False
-            else:
-                if self.total_price > self.swap_storage.assets[self.receivingAssetName]["balance"]:
                     self.valid_order = False
         else:
             self.asset_name = self.swap_storage.my_asset_names[self.cmbAssets.currentIndex()]
@@ -224,18 +235,6 @@ class NewOrderDialog(QDialog):
         if self.waiting_txid or not self.asset_exists:
             self.valid_order = False
 
-        if self.AssetTrade.isChecked():
-            self.assetForAsset = True
-            self.ReceivingAsset.setEnabled(True)
-            self.btnCheckAvailableReceiving.setEnabled(True)
-            self.label_3.setText("Amount")
-            self.spinUnitPrice.setSuffix(" " + self.ReceivingAsset.text())
-        else:
-            self.assetForAsset = False
-            self.ReceivingAsset.setEnabled(False)
-            self.btnCheckAvailableReceiving.setEnabled(False)
-            self.label_3.setText("Price")
-            self.spinUnitPrice.setSuffix(" RVN")
 
         # valid_order check doesn't cover UTXO existing b/c valid_order determins if we enable the UTXO button or not
         # Update GUI
