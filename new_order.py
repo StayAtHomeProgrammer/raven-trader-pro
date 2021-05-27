@@ -209,8 +209,10 @@ class NewOrderDialog(QDialog):
             self.btnDialogButtons.setStandardButtons(QDialogButtonBox.Cancel)
 
         if self.AssetTrade.isChecked():
-            print("clicked")
             self.label_3.setText("Amount")
+            self.spinUnitPrice.setSuffix(self.cmbAssets.currentText())
+        else:
+            self.label_3.setText("Price")
             self.spinUnitPrice.setSuffix(self.cmbAssets.currentText())
 
     def build_order(self):
