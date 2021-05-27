@@ -24,6 +24,7 @@ from config import *
 ## Main app entry point
 if __name__ == "__main__":
   app = QApplication(sys.argv)
+  chain_info = None
   try:
     chain_info = do_rpc("getblockchaininfo")
   except RPCError as error:
@@ -34,7 +35,7 @@ if __name__ == "__main__":
                " and \nthe following configuration "
                "variables are in your raven.conf file" +
                "\r\n\r\nserver=1\r\nrpcuser={}\r\nrpcpassword={}".format(RPC_USERNAME, RPC_PASSWORD))
-    # exit(1) Comment out for debugging
+    exit(1)
 
   #If the headers and blocks are not within 5 of each other,
   #then the chain is likely still syncing
@@ -58,6 +59,7 @@ if __name__ == "__main__":
     show_error("Sync Error", 
     "Server appears to not be fully synchronized. Must be at the latest tip to continue.",
     "Network: {}\r\nCurrent Headers: {}\r\nCurrent Blocks: {}".format(chain_info["chain"], chain_info["headers"], chain_info["blocks"]))
+    exit(1)
   else:
     show_error("Error connecting", 
     "We dont know what went wrong",

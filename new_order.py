@@ -61,6 +61,10 @@ class NewOrderDialog(QDialog):
         self.lblWhatUTXO.mousePressEvent = self.show_utxo_help  # apparently this event is jenky?
         self.update()
 
+        if self.AssetTrade.isChecked():
+            self.label_3.setText("Amount")
+            self.spinUnitPrice.setSuffix(self.cmbAssets.currentText())
+
     def show_utxo_help(self, *args):
         show_dialog("UTXO Explanation",
                     "Blockchain balances are comprised of the sum of many individual unspent transaction outputs (UTXO's). " +

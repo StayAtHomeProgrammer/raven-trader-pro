@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>Dialog</class>
  <widget class="QDialog" name="Dialog">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -14,35 +17,14 @@
    <string>Dialog</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
-   <item row="1" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Asset</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QComboBox" name="cmbAssets">
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QPushButton" name="btnCheckAvailable">
-     <property name="text">
-      <string>Check Available</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
+   <item row="9" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>Quantity</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
+   <item row="9" column="1">
     <widget class="QDoubleSpinBox" name="spinQuantity">
      <property name="decimals">
       <number>8</number>
@@ -58,14 +40,14 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
+   <item row="10" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>Price</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="10" column="1">
     <widget class="QDoubleSpinBox" name="spinUnitPrice">
      <property name="suffix">
       <string> RVN</string>
@@ -84,21 +66,21 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
+   <item row="11" column="0">
     <widget class="QLabel" name="label_4">
      <property name="text">
       <string>Total Price</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
+   <item row="11" column="1">
     <widget class="QLabel" name="lblTotalDisplay">
      <property name="text">
       <string>##.# RVN</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="0">
+   <item row="12" column="0">
     <widget class="QLabel" name="lblWhatUTXO">
      <property name="cursor">
       <cursorShape>WhatsThisCursor</cursorShape>
@@ -108,7 +90,7 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
+   <item row="12" column="1">
     <widget class="QCheckBox" name="chkUTXOReady">
      <property name="enabled">
       <bool>false</bool>
@@ -118,21 +100,21 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
+   <item row="13" column="1">
     <widget class="QPushButton" name="btnCreateUTXO">
      <property name="text">
       <string>Create Order UTXO</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="0">
+   <item row="14" column="0">
     <widget class="QLabel" name="label_5">
      <property name="text">
       <string>Destination</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="1">
+   <item row="14" column="1">
     <widget class="QLineEdit" name="txtDestination">
      <property name="text">
       <string/>
@@ -142,13 +124,44 @@
      </property>
     </widget>
    </item>
-   <item row="9" column="1">
+   <item row="15" column="1">
     <widget class="QDialogButtonBox" name="btnDialogButtons">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QPushButton" name="btnCheckAvailable">
+     <property name="text">
+      <string>Check Available</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QComboBox" name="cmbAssets">
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Asset</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QRadioButton" name="AssetTrade">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Trade for Asset</string>
      </property>
     </widget>
    </item>
