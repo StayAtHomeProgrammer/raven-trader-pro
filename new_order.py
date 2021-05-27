@@ -38,7 +38,7 @@ class NewOrderDialog(QDialog):
             self.cmbAssets.currentTextChanged.connect(self.asset_changed)
             self.cmbAssets.addItems(self.swap_storage.my_asset_names)
             self.cmbAssets.setCurrentText("")
-            self.ReceivingAsset.textChanged.connect(self.update())
+            self.ReceivingAsset.textChanged.connect(self.update)
             # self.btnCheckreceivingAsset.clicked.connect(self.check_available_receiving)
 
         elif self.mode == "sell":
