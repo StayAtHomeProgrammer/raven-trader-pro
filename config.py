@@ -1,4 +1,4 @@
-TESTNET = False
+TESTNET = True
 
 RPC_USERNAME = "StayAtHomeProgrammer"
 RPC_PASSWORD = "justsomepoormf"

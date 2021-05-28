@@ -26,7 +26,7 @@ class NewOrderDialog(QDialog):
         self.assetForAsset = self.AssetTrade.isChecked()
         self.swap_storage.load_utxos()
         self.waiting_txid = None
-        self.asset_exists = True
+        self.asset_exists = False
         self.receivingAssetExists = False
         self.all_utxo = False  # allow perfectly rounded UTXO's only when waiting from the start
 
@@ -53,7 +53,7 @@ class NewOrderDialog(QDialog):
             self.cmbAssets.setCurrentText(prefill["asset"])
             self.spinQuantity.setValue(prefill["quantity"])
             self.spinUnitPrice.setValue(prefill["unit_price"])
-            self.asset_exists = True
+            self.asset_exists = False
             if "waiting" in prefill:
                 self.waiting_txid = prefill["waiting"]
                 self.all_utxo = True
@@ -92,30 +92,35 @@ class NewOrderDialog(QDialog):
         self.update()
 
     def check_available_receiving(self):
-        balance = self.swap_storage.assets[self.receivingAssetName]["balance"]
+        balance = self.swap_storage.assets[self.receivingAssetName]["balance"] if self.receivingAssetName in \
+            self.swap_storage.assets else 0
         self.receivingAssetExists = bool(int(balance))
         self.btnCheckAvailableReceiving.setEnabled(False)
         if self.receivingAssetExists:
             self.spinUnitPrice.setEnabled(True)
             self.btnCheckAvailableReceiving.setText("Yes! - you have {} total".format(balance))
-            self.btnCheckAvailableReceiving.setEnabled(False)
             self.spinUnitPrice.setMaximum(float(balance))
         else:
             if self.ReceivingAsset.text().islower():
                 show_error("Error", "You do not have this asset! Assets are case-sensitive.")
-            self.spinUnitPrice.setEnabled(False)
-            self.btnCheckAvailable.setText("Asset does not exist!")
+            self.spinUnitPrice.setEnabled(True)
+            self.btnCheckAvailableReceiving.setText("Asset does not exist!")
         self.update()
 
     def asset_changed(self):
         self.asset_exists = False
         self.btnCheckAvailable.setText("Check Available")
         self.btnCheckAvailable.setEnabled(True)
+        self.update()
 
     def receiving_asset_changed(self):
         self.receivingAssetExists = False
         self.btnCheckAvailableReceiving.setText("Check Balance")
-        self.receivingAssetName = self.ReceivingAsset.text()
+        if not self.ReceivingAsset.text() == "":
+            self.btnCheckAvailableReceiving.setEnabled(True)
+        else:
+            self.btnCheckAvailableReceiving.setEnabled(False)
+        self.update()
 
     def create_utxo(self):
         summary = "Send yourself {} to costruct a {} order?"
@@ -143,8 +148,8 @@ class NewOrderDialog(QDialog):
                     if not self.assetForAsset:
                         self.waiting_txid = do_rpc("sendtoaddress", address=new_change_addr, amount=self.total_price)
                     else:
-                        self.waiting_txid = do_rpc("transfer", asset=self.receivingAssetName, qty=self.price,
-                                                   to_address=new_change_addr)
+                        self.waiting_txid = do_rpc("transfer", asset_name=self.receivingAssetName, qty=self.total_price,
+                                                   to_address=new_change_addr)[0]
                 elif self.mode == "sell":
                     print("Creating self asset transaction")
                     check_unlock()
@@ -209,7 +214,6 @@ class NewOrderDialog(QDialog):
         if self.AssetTrade.isChecked():
             self.assetForAsset = True
             self.ReceivingAsset.setEnabled(True)
-            self.btnCheckAvailableReceiving.setEnabled(True)
             self.label_3.setText("Amount")
             self.spinUnitPrice.setSuffix(" " + self.ReceivingAsset.text())
         else:
@@ -251,10 +255,24 @@ class NewOrderDialog(QDialog):
         self.lblTotalDisplay.setText("{:.8g} {}".format(self.total_price, "RVN" if not self.assetForAsset
                                                         else self.ReceivingAsset.text()))
         self.chkUTXOReady.setChecked(self.order_utxo is not None)
+
+        if self.assetForAsset:
+            if self.receivingAssetExists and self.asset_exists:
+                self.btnCreateUTXO.setEnabled(True)
+            else:
+                self.btnCreateUTXO.setEnabled(False)
+        else:
+            if self.asset_exists:
+                self.btnCreateUTXO.setEnabled(True)
+            else:
+                self.btnCreateUTXO.setEnabled(False)
+        """
         if self.waiting_txid:
             self.btnCreateUTXO.setEnabled(False)
         else:
             self.btnCreateUTXO.setEnabled(self.order_utxo is None)
+        """
+
         # Hide the button if we don't have a valid order
         if self.order_utxo and self.valid_order:
             self.btnDialogButtons.setStandardButtons(QDialogButtonBox.Cancel | QDialogButtonBox.Ok)
@@ -272,7 +290,8 @@ class NewOrderDialog(QDialog):
             "state": "new",
             "type": self.mode,
             "raw": "--",
-            "txid": ""
+            "txid": "",
+            "assetForAsset": self.assetForAsset
         })
 
 

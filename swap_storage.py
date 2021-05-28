@@ -130,12 +130,12 @@ class SwapStorage:
                 if (utxo_amount == float(quantity) and exact) or (rvn_utxo["amount"] >= quantity and not exact):
                     return rvn_utxo
         elif type == "asset":
-            matching_asset = self.assets[name]
-            if (matching_asset):
-                if (matching_asset["balance"] < quantity):
+            matching_asset = self.assets[name] if name in self.assets else None
+            if matching_asset:
+                if matching_asset["balance"] < quantity:
                     return None
-                utxo_src = sorted(matching_asset["outpoints"], key=lambda a_utxo: a_utxo["amount"]) if sort_utxo else \
-                matching_asset["outpoints"]
+                # utxo_src = sorted(matching_asset["outpoints"], key=lambda a_utxo: a_utxo["amount"]) if sort_utxo else \
+                # matching_asset["outpoints"]
                 for asset_utxo in matching_asset["outpoints"]:
                     if (self.is_taken(asset_utxo, skip_locks)):
                         continue
