@@ -163,6 +163,8 @@ class MainWindow(QMainWindow):
           self.update_lists()
         else:
           print("Transaction Rejected")
+      else:
+        print("transaction failed =(")
 
   def view_order_details(self, widget):
     list = widget.listWidget()

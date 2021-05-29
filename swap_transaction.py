@@ -181,7 +181,7 @@ class SwapTransaction():
             test_create = do_rpc("createrawtransaction", inputs=final_vin, outputs=final_vout)
             estimated_fee = 0.01 * len(test_create) / 2 / 1024  # 2 hex chars = 1 byte
 
-            fee_test = float(self.decoded["src_vout"]["value"]) - estimated_fee
+            fee_test = estimated_fee # float(self.decoded["src_vout"]["value"]) - estimated_fee
 
             # Jenky AF, no great way to estimate raw fee from rpc, so lower and test in mempool until good
             while fee_test > 0:
@@ -253,7 +253,7 @@ class SwapTransaction():
             else:
                 asset_data = swap_vout["scriptPubKey"]["asset"]
                 vout_data = make_transfer(asset_data["name"], asset_data["amount"])
-                total_price = src_vout["value"]
+                total_price = src_vout["scriptPubKey"]["asset"]["amount"]
 
             unit_price = float(total_price) / float(asset_data["amount"])
 
