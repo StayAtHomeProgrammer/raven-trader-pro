@@ -169,6 +169,7 @@ class NewOrderDialog(QDialog):
             if (self.waiting_txid):
                 show_dialog("Success!", "Transaction {} submitted successfully.".format(self.waiting_txid),
                             "Waiting for confirmation")
+                self.btnCreateUTXO.setEnabled(False)
                 self.start_waiting()
                 self.wait_timer()
             else:
@@ -266,12 +267,6 @@ class NewOrderDialog(QDialog):
                 self.btnCreateUTXO.setEnabled(True)
             else:
                 self.btnCreateUTXO.setEnabled(False)
-        """
-        if self.waiting_txid:
-            self.btnCreateUTXO.setEnabled(False)
-        else:
-            self.btnCreateUTXO.setEnabled(self.order_utxo is None)
-        """
 
         # Hide the button if we don't have a valid order
         if self.order_utxo and self.valid_order:
