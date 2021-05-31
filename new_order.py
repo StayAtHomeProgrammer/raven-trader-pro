@@ -215,7 +215,6 @@ class NewOrderDialog(QDialog):
         if self.AssetTrade.isChecked():
             self.assetForAsset = True
             self.ReceivingAsset.setEnabled(True)
-            self.label_3.setText("Amount")
             self.spinUnitPrice.setSuffix(" " + self.ReceivingAsset.text())
         else:
             self.assetForAsset = False

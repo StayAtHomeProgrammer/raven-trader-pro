@@ -67,6 +67,7 @@ class SwapTransaction():
         final_vin = [{"txid": self.decoded["vin"]["txid"], "vout": self.decoded["vin"]["vout"],
                       "sequence": self.decoded["vin"]["sequence"]}]
         final_vout = {self.destination: self.decoded["vout_data"]}
+        print(f"vin: {final_vin}\nvout: {final_vout}")
 
         tx_allowed = False
         tx_final = None
@@ -155,7 +156,7 @@ class SwapTransaction():
 
             # Search for valid UTXO, no need for exact match
             asset_utxo = swap_storage.find_utxo("asset", self.quantity, name=self.asset, exact=False, skip_locks=True)
-            if (not asset_utxo):
+            if not asset_utxo:
                 print("Unable to find a single UTXO for purchasing. Does not combine automatically yet")
                 exit()
 
@@ -174,6 +175,8 @@ class SwapTransaction():
                 final_vout[asset_change_addr] = make_transfer(self.asset, asset_utxo["amount"] - self.quantity)
 
             final_vout[target_addr] = 0
+
+            #TODO: I FOUND THE FUCKING BUG. THE ADDRESS FOR THE RECEIVING IS NOT ADDED.
 
             print("Final Vin: ", final_vin)
             print("Final Vout: ", final_vout)
@@ -195,6 +198,9 @@ class SwapTransaction():
 
                 # Sign our part with our keys
                 signed_raw = do_rpc("signrawtransaction", hexstring=combined_raw)
+
+                print(signed_raw)
+
                 signed_hex = signed_raw["hex"]
 
                 mem_accept = do_rpc("testmempoolaccept", rawtxs=[signed_hex])
